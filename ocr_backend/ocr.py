@@ -1,4 +1,3 @@
-# suppposed to integrate eveyrth in one fn so can easily call the API
 from PIL import Image
 import cv2
 from google.cloud import vision
@@ -20,7 +19,7 @@ def detect_text(img):
     new_image.save('new.png')
 
   # mode shld be rb for images - read binary as image files have raw binary data - need to change this to read in the pixel values which may not be rb
-    with open(new_image, "rb") as image_file:
+    with open('new.png', "rb") as image_file:
         content = image_file.read()
 
     image = vision.Image(content=content)
@@ -28,13 +27,14 @@ def detect_text(img):
   # text_detection is the api to detect text in the image
     response = client.text_detection(image=image)
     texts = response.text_annotations
-    # print("Texts:", texts)
+    print("Texts:", texts)
 
     stop_id = None
+    print(texts)
     for text in texts:
         if text.description.isdigit():
             stop_id = text.description
-            # print(f'\n"{stop_id}"') 
+            print(f'\n"{stop_id}"') 
             vertices = [
             f"({vertex.x},{vertex.y})" for vertex in text.bounding_poly.vertices
             ]
