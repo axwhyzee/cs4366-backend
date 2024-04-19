@@ -206,6 +206,12 @@ def init_paths():
     print(WAYPOINTS)
 
 
+@app.route('/get_text', methods=['POST'])
+def get_text():
+    img = request.form.get('img')
+    return ''
+
+
 if __name__ == '__main__':
     init_paths()
     app.run(port=5000)
