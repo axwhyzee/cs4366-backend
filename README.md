@@ -1,6 +1,17 @@
 # Setup
 
-## 1) wmata-backend
+## 1) Virtual env and dependencies
+```
+python -m venv venv
+
+source venv/bin/activate # for macos
+./venv/bin/activate # for windows
+
+pip install -r requirements.txt
+```
+
+
+## 2) wmata-backend
 The `wmata-backend` server is hosted on [PythonAnywhere](https://www.pythonanywhere.com/) at [https://siahweehung1748.pythonanywhere.com/](https://siahweehung1748.pythonanywhere.com/).
 To host your own, add a `.env` file in the root `cs4366-backend` folder with the following environment variables.
 
@@ -20,7 +31,7 @@ python wmata-backend/app.py
 
 <br/>
 
-## 2) ocr_backend + obj_detect_backend
+## 3) ocr_backend + obj_detect_backend
 ### Google Cloud API Key
 Obtain a Google Cloud API key and authenticate using [gcloud CLI](https://cloud.google.com/docs/authentication/gcloud) 
 
@@ -30,7 +41,7 @@ python main.py
 ```
 <br/>
 
-## 3) Expose server(s)
+## 4) Expose server(s)
 
 If you are running your own `wmata-backend` server, run the following to find your `ngrok.yml` config filepath
 ```
