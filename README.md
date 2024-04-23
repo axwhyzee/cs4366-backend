@@ -17,12 +17,7 @@ Start the wmata-backend server
 ```
 python wmata-backend/app.py
 ```
-<br/>
 
-In another terminal, expose your localhost server
-```
-ngrok http 5000
-```
 <br/>
 
 ## 2) ocr_backend + obj_detect_backend
@@ -33,9 +28,36 @@ Start the `ocr_backend` & `obj_detect_backend` joint server
 ```
 python main.py
 ```
-In another terminal, expose your localhost server
+<br/>
+
+## 3) Expose server(s)
+
+If you are running your own `wmata-backend` server, run the following to find your `ngrok.yml` config filepath
+```
+ngrok config check
+```
+
+Open `ngrok.yml` and add the following snippet to allow for multiple port tunneling on a single agent session
+```
+tunnels:
+  first:
+    addr: 5001
+    proto: http
+  second:
+    addr: 5002
+    proto: http
+```
+
+Expose both servers
+```
+ngrok start --all
+```
+
+Otherwise, if you are only running the `ocr_backend` & `obj_detect_backend` joint server, expose the joint server port only (no need to modify `ngrok.yml`
 ```
 ngrok http 5001
 ```
 
+### Trouble shooting 
+If any of the backend servers are returning HTTP 403 error, specify a different port in `main.py` and `wmata-backend/app.py`'s `app.run(port=<ANOTHER_AVAILABLE_PORT>, ...)`. Update the ports to be exposed via ngrok.
 
