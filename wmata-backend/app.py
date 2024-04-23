@@ -14,8 +14,10 @@ WAYPOINTS = {}
 
 app = Flask(__name__)
 
+@app.route('/')
+def root():
+    return '/'
 
-@logger
 @app.route('/path', methods=['GET'])
 def query_path():
     """Fetch path for a given route
@@ -30,8 +32,6 @@ def query_path():
         WAYPOINTS[route_id][route_dir] = get_waypoints(route_id)
     return WAYPOINTS[route_id][route_dir]
 
-
-@logger
 @app.route('/positions', methods=['GET'])
 def query_positions():
     """Fetch bus positions for an array of given routes
@@ -55,11 +55,9 @@ def query_positions():
 
         for bus in pos.get('BusPositions', []):
             if bus.get('DirectionText') == route_dir:
-                res_pos.append((bus.get('Lon'), bus.get('Lat')))
+                res_pos.append({"longitude": bus.get('Lon'), "latitude": bus.get('Lat')})
     return res
 
-
-@logger
 @app.route('/stop', methods=['GET'])
 def query_stop():
     """Fetch bus info for a given stop ID + routes served by the stop
@@ -116,73 +114,12 @@ def query_stop():
 
     return res
 
-
-'''
 @logger
-@app.route('/stop', methods=['GET'])
-def query_stop():
-    """Fetch bus info for a given stop ID, as well as live timings and bus positions of routes served by the stop"""
-    stop_id = request.args.get('stop_id')
-    res = {}
-    stop_schedules = get_stop_schedule(stop_id)
-
-    if 'Stop' not in stop_schedules:
-        print('Invalid stop ID')
-        return res
-
-    stop_info = stop_schedules['Stop']
-    stop_id = stop_info.get('StopID')
-    stop_name = stop_info.get('Name')
-    stop_lon = stop_info.get('Lon')
-    stop_lat = stop_info.get('Lat')
-    stop_routes = stop_info.get('Routes')
-
-    res['stop_id'] = stop_id
-    res['stop_name'] = stop_name
-    res['stop_lon'] = stop_lon
-    res['stop_lat'] = stop_lat
-    res['stop_routes'] = {route: {'times': [], 'coords': [], 'dir': ''}
-                          for route in set(list(map(lambda x: stem_route(x), stop_routes)))}
-
-    timings = get_stop_predictions(stop_id)
-    visited = set()
-
-    for pred in timings.get('Predictions', []):
-        route_id = pred.get('RouteID')
-        route_dir_text_full = pred.get('DirectionText')
-        route_dir_text = name_to_dir(route_dir_text_full)
-        route_time = pred.get('Minutes')
-        print(f'{route_id=} {route_time=} {route_dir_text_full=}')
-
-        route = res['stop_routes'][route_id]
-        route['times'].append(route_time)
-        route['dir'] = route_dir_text
-
-        if route_id in visited:
-            continue
-
-        visited.add(route_id)
-        pos = get_bus_positions(route_id, route_dir_text, stop_lon, stop_lat)
-
-        for bus in pos.get('BusPositions', []):
-            if bus.get('DirectionText') == route_dir_text:
-                bus_lon = bus.get('Lon')
-                bus_lat = bus.get('Lat')
-                route['coords'].append((bus_lon, bus_lat))
-                print(f'{bus_lon=} {bus_lat=}')
-
-    return res
-'''
-
-
 def init_paths():
     routes = get_routes()
 
     for route in routes.get('Routes', []):
         raw_route_id = route.get('RouteID')
-        if 'S2' not in raw_route_id:
-            continue
-
         wps = get_waypoints(raw_route_id)
 
         for key, val in wps.items():
@@ -196,22 +133,13 @@ def init_paths():
             if route_id in WAYPOINTS and route_dir in WAYPOINTS[route_id]:
                 continue
 
-            print(route_id, route_dir)
-
             WAYPOINTS[route_id] = WAYPOINTS.get(route_dir, {route_dir: {}})
             WAYPOINTS[route_id][route_dir]['coords'] = list(
-                map(lambda x: (x['Lon'], x['Lat']), val['Shape']))
+                map(lambda x: {"longitude": x['Lon'], "latitude": x['Lat']}, val['Shape']))
             WAYPOINTS[route_id][route_dir]['stops'] = list(
-                map(lambda x: (x['Lon'], x['Lat']), val['Stops']))
-    print(WAYPOINTS)
-
-
-@app.route('/get_text', methods=['POST'])
-def get_text():
-    img = request.form.get('img')
-    return ''
-
+                map(lambda x: {"longitude": x['Lon'], "latitude": x['Lat']}, val['Stops']))
+    print('init_paths() finished')
 
 if __name__ == '__main__':
     init_paths()
-    app.run(port=5000)
+    app.run(port=5002)
