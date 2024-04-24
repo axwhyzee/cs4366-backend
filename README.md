@@ -33,7 +33,9 @@ python wmata-backend/app.py
 
 ## 3) ocr_backend + obj_detect_backend
 ### Google Cloud API Key
-Obtain a Google Cloud API key and authenticate using [gcloud CLI](https://cloud.google.com/docs/authentication/gcloud) 
+Obtain a Google Cloud API key and authenticate using [gcloud CLI](https://cloud.google.com/docs/authentication/gcloud)  
+
+Refer to the docs https://cloud.google.com/vision/docs/before-you-begin for setting up the gcloud CLI and enabling it for the project to use the API.
 
 Start the `ocr_backend` & `obj_detect_backend` joint server
 ```
